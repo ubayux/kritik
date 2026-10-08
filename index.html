@@ -33,7 +33,7 @@ h1{font:800 .95rem var(--fb);letter-spacing:3px;text-align:center;text-transform
 .q small.req{background:rgba(255,200,61,.16);color:var(--gold);opacity:1}
 .hint{font-size:.72rem;opacity:.55;margin:0 0 14px;line-height:1.4}
 
-.hello{text-align:center;padding:18px;margin-bottom:14px}.hello .hi{font:800 1rem var(--fb);letter-spacing:.5px}.hello .hinfo{font-size:.78rem;opacity:.7;margin-top:6px;line-height:1.5}
+.hello{text-align:center;padding:18px;margin-bottom:14px}.hello .hi{font:800 1rem var(--fb);letter-spacing:.5px}.hello .hinfo{font-size:.78rem;margin-top:6px;line-height:1.5}
 .hello .tag{display:inline-block;margin:2px 3px;padding:4px 10px;border-radius:99px;font:600 .66rem var(--fb);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2)}
 /* bintang */
 .stars{display:flex;justify-content:center;gap:6px}
@@ -54,19 +54,33 @@ h1{font:800 .95rem var(--fb);letter-spacing:3px;text-align:center;text-transform
 .asp .stars{flex:none;gap:2px}.asp .star{width:30px;max-width:30px;flex:none}
 
 /* pilihan */
-.chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{width:auto;margin:0;padding:10px 15px;border-radius:99px;font:600 .78rem var(--fu);color:#fff;cursor:pointer;
-  background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.05));border:1px solid rgba(255,255,255,.2);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.3);transition:transform .15s,background .2s,border-color .2s,color .2s;display:inline-flex;align-items:center;gap:6px}
-.chip:active{transform:scale(.95)}
-.chip .em{font-size:1rem;line-height:1}
-.chip.on{background:linear-gradient(180deg,#fff,#e6e6ea);color:#000;border-color:#fff;box-shadow:0 6px 16px -6px rgba(255,255,255,.5)}
-.chip.neg.on{background:linear-gradient(180deg,#ffb4ad,#ff8a82);border-color:#ffd1cc}
-.chip:focus-visible{outline:2px solid #fff;outline-offset:2px}
-.rec{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.rec .chip{flex-direction:column;gap:4px;border-radius:20px;padding:12px 6px;text-align:center;justify-content:center;font-size:.74rem}
-.rec .chip .em{font-size:1.5rem}
+/* pilihan rapi (grid 2 kolom) */
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opt{position:relative;width:100%;margin:0;min-height:58px;padding:9px 32px 9px 10px;border-radius:18px;display:flex;align-items:center;gap:9px;text-align:left;cursor:pointer;color:#fff;font:600 .74rem/1.25 var(--fu);
+  background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.04));border:1px solid rgba(255,255,255,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.22);
+  transition:transform .15s,background .2s,border-color .2s,color .2s}
+.opt:active{transform:scale(.97)}
+.opt .em{flex:none;width:28px;height:28px;border-radius:9px;display:grid;place-items:center;font-size:1rem;line-height:1;background:rgba(255,255,255,.1)}
+.opt .tx{flex:1;min-width:0}
+.opt::after{content:'';position:absolute;right:10px;top:50%;width:17px;height:17px;margin-top:-8.5px;border-radius:50%;border:1.5px solid rgba(255,255,255,.35);transition:all .2s}
+.opt.on{background:rgba(255,138,130,.16);border-color:var(--bad)}
+.opt.on::after{background:var(--bad) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center/12px no-repeat;border-color:var(--bad)}
+.opt.wide,.opt.good{grid-column:1/-1}
+.opt.good{justify-content:center;min-height:52px}
+.opt.good .tx{flex:none}
+.opt.good.on{background:rgba(126,226,160,.16);border-color:var(--ok)}
+.opt.good.on::after{background-color:var(--ok);border-color:var(--ok)}
+.opt:focus-visible{outline:2px solid #fff;outline-offset:2px}
+@media (max-width:340px){.opts{grid-template-columns:1fr}}
 
+/* ringkasan pesanan */
+.ordbox{margin-top:14px;padding:2px 14px;border-radius:18px;text-align:left;background:rgba(0,0,0,.38);border:1px solid rgba(255,255,255,.1)}
+.ordrow{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding:10px 0;border-top:1px solid rgba(255,255,255,.09);font-size:.78rem}
+.ordrow:first-child{border-top:0}
+.ordrow>span{opacity:.6;flex:none;padding-top:3px}
+.ordrow>b{font:700 .8rem var(--fb);text-align:right;min-width:0;overflow-wrap:anywhere}
+.ordrow .tags{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:5px}
+.ordrow .tag{margin:0}
 /* input */
 label{display:block;font-size:.72rem;font-weight:600;opacity:.75;margin:0 0 6px 6px}
 input,textarea{width:100%;padding:14px 18px;margin:0 0 12px;border-radius:20px;border:1px solid rgba(255,255,255,.14);
@@ -89,7 +103,7 @@ textarea{resize:none;min-height:96px;line-height:1.5;overflow:hidden;margin-bott
 @keyframes sp{to{transform:rotate(360deg)}}
 
 /* notifikasi */
-#notif{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));transform:translate(-50%,-140%);z-index:50;width:min(92vw,420px);padding:14px 16px;border-radius:22px;
+#notif{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));transform:translate(-50%,-220%);z-index:50;width:min(92vw,420px);padding:14px 16px;border-radius:22px;
   background:rgba(40,12,10,.88);border:1px solid rgba(255,107,97,.6);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);font-size:.8rem;line-height:1.45;transition:transform .45s cubic-bezier(.34,1.56,.64,1)}
 #notif.show{transform:translate(-50%,0)}#notif b{display:block;font:800 .72rem var(--fb);letter-spacing:1px;color:var(--bad);margin-bottom:4px}
 #notif ul{margin:0;padding-left:18px}
@@ -135,31 +149,17 @@ textarea{resize:none;min-height:96px;line-height:1.5;overflow:hidden;margin-bott
   </div>
 
   <div class="card">
-   <div class="q">Apa yang kamu suka? <small>PILIH BEBERAPA</small></div>
-   <p class="hint" style="margin-bottom:10px">Ketuk untuk memilih</p>
-   <div class="chips" data-g="suka">
-    <button type="button" class="chip" aria-pressed="false"><span class="em">✨</span>Hasil bersih</button>
-    <button type="button" class="chip" aria-pressed="false"><span class="em">⚡</span>Cepat selesai</button>
-    <button type="button" class="chip" aria-pressed="false"><span class="em">💰</span>Harga terjangkau</button>
-    <button type="button" class="chip" aria-pressed="false"><span class="em">😊</span>Admin ramah</button>
-    <button type="button" class="chip" aria-pressed="false"><span class="em">📲</span>Mudah pesan</button>
-    <button type="button" class="chip" aria-pressed="false"><span class="em">📦</span>Kemasan rapi</button>
-    <button type="button" class="chip" aria-pressed="false"><span class="em">🛵</span>Antar jemput</button>
-   </div>
-  </div>
-
-  <div class="card">
    <div class="q">Apa yang perlu diperbaiki? <small>PILIH BEBERAPA</small></div>
-   <p class="hint" style="margin-bottom:10px">Ketuk untuk memilih</p>
-   <div class="chips" data-g="perbaiki" data-excl="Tidak ada, sudah bagus">
-    <button type="button" class="chip neg" aria-pressed="false">Hasil kurang bersih</button>
-    <button type="button" class="chip neg" aria-pressed="false">Pengerjaan terlalu lama</button>
-    <button type="button" class="chip neg" aria-pressed="false">Harga</button>
-    <button type="button" class="chip neg" aria-pressed="false">Balasan admin lambat</button>
-    <button type="button" class="chip neg" aria-pressed="false">Proses pemesanan</button>
-    <button type="button" class="chip neg" aria-pressed="false">Kemasan</button>
-    <button type="button" class="chip neg" aria-pressed="false">Lainnya</button>
-    <button type="button" class="chip" aria-pressed="false" data-x="1">👍 Tidak ada, sudah bagus</button>
+   <p class="hint">Ketuk untuk memilih, boleh lebih dari satu</p>
+   <div class="opts" data-g="perbaiki">
+    <button type="button" class="opt" aria-pressed="false"><span class="em">🧼</span><span class="tx">Hasil kurang bersih</span></button>
+    <button type="button" class="opt" aria-pressed="false"><span class="em">⏱️</span><span class="tx">Pengerjaan lama</span></button>
+    <button type="button" class="opt" aria-pressed="false"><span class="em">💸</span><span class="tx">Harga</span></button>
+    <button type="button" class="opt" aria-pressed="false"><span class="em">💬</span><span class="tx">Balasan admin lambat</span></button>
+    <button type="button" class="opt" aria-pressed="false"><span class="em">📝</span><span class="tx">Proses pemesanan</span></button>
+    <button type="button" class="opt" aria-pressed="false"><span class="em">📦</span><span class="tx">Kemasan</span></button>
+    <button type="button" class="opt wide" aria-pressed="false"><span class="em">➕</span><span class="tx">Lainnya</span></button>
+    <button type="button" class="opt good" aria-pressed="false" data-x="1"><span class="em">👍</span><span class="tx">Tidak ada, sudah bagus</span></button>
    </div>
   </div>
 
@@ -224,17 +224,17 @@ $('aspects').innerHTML=ASP.map(a=>`<div class="asp"><span>${a[1]}</span><div cla
 document.querySelectorAll('#aspects .stars').forEach(b=>{const k=b.dataset.k;buildStars(b,k,()=>V.aspects[k]||0,v=>{if(v)V.aspects[k]=v;else delete V.aspects[k]},true)});
 
 /* ---------- pilihan (chip) ---------- */
-document.querySelectorAll('.chips[data-g]').forEach(g=>{
+document.querySelectorAll('[data-g]').forEach(g=>{
   g.addEventListener('click',e=>{
-    const c=e.target.closest('.chip');if(!c)return;
+    const c=e.target.closest('.opt,.chip');if(!c)return;
     const single=g.dataset.single==='1',on=!c.classList.contains('on');
-    if(single)g.querySelectorAll('.chip').forEach(x=>{x.classList.remove('on');x.setAttribute('aria-pressed','false')});
-    if(c.dataset.x&&on)g.querySelectorAll('.chip').forEach(x=>{if(x!==c){x.classList.remove('on');x.setAttribute('aria-pressed','false')}});
-    else if(on&&g.querySelector('.chip[data-x].on'))g.querySelector('.chip[data-x]').classList.remove('on'),g.querySelector('.chip[data-x]').setAttribute('aria-pressed','false');
+    if(single)g.querySelectorAll('.opt,.chip').forEach(x=>{x.classList.remove('on');x.setAttribute('aria-pressed','false')});
+    if(c.dataset.x&&on)g.querySelectorAll('.opt,.chip').forEach(x=>{if(x!==c){x.classList.remove('on');x.setAttribute('aria-pressed','false')}});
+    else if(on&&g.querySelector('[data-x].on'))g.querySelector('[data-x]').classList.remove('on'),g.querySelector('[data-x]').setAttribute('aria-pressed','false');
     c.classList.toggle('on',on);c.setAttribute('aria-pressed',on);
   });
 });
-const picked=g=>[...document.querySelectorAll('.chips[data-g="'+g+'"] .chip.on')].map(c=>c.textContent.replace(/^[^\wÀ-ž]+/u,'').trim());
+const picked=g=>[...document.querySelectorAll('[data-g="'+g+'"] .on')].map(c=>c.textContent.replace(/^[^\wÀ-ž]+/u,'').trim());
 
 /* ---------- teks ---------- */
 const ta=$('saran');ta.addEventListener('input',()=>{ta.style.height='auto';ta.style.height=Math.max(96,ta.scrollHeight)+'px';$('cnt').textContent=ta.value.length});
@@ -242,10 +242,11 @@ document.addEventListener('input',e=>{if(e.target.classList)e.target.classList.r
 /* ---------- data pesanan otomatis dari link: ?d=<kode> ---------- */
 const ORD=(function(){
   try{
-    const raw=new URLSearchParams(location.search).get('d');if(!raw)return null;
-    const j=JSON.parse(decodeURIComponent(escape(atob(raw.replace(/-/g,'+').replace(/_/g,'/')))));
+    let raw=new URLSearchParams(location.search).get('d');if(!raw)return null;
+    raw=raw.replace(/-/g,'+').replace(/_/g,'/').replace(/\s/g,'');while(raw.length%4)raw+='=';
+    const j=JSON.parse(decodeURIComponent(escape(atob(raw))));
     const t=(v,n)=>String(v==null?'':v).slice(0,n);
-    return{id:t(j.i,30),nota:t(j.n,20),nama:t(j.p||j.u,60),depan:t(j.u||String(j.p||'').split(' ')[0],30),wa:t(j.w,20),layanan:Array.isArray(j.s)?j.s.slice(0,8).map(x=>t(x,40)):[]};
+    return{id:t(j.i,30),nota:t(j.n,20),nama:t(j.p||j.u,60),depan:t(j.u||String(j.p||'').split(' ')[0],30),wa:t(j.w,20),jumlah:Math.max(0,parseInt(j.q,10)||0),layanan:Array.isArray(j.s)?j.s.slice(0,8).map(x=>t(x,50)):[]};
   }catch(e){return null}
 })();
 (function(){
@@ -253,9 +254,15 @@ const ORD=(function(){
   if(!ORD){h.textContent='Halo, Sahabat U.ShoeS! 👋';i.textContent='Ceritakan pengalamanmu mencuci sepatu di U.ShoeS.';return}
   h.textContent='Halo, '+(ORD.depan||'Sahabat')+'! 👋';
   i.textContent='';
-  if(ORD.nota){const t=document.createElement('div');t.textContent='Pesanan #'+ORD.nota;t.style.cssText='font:700 .72rem var(--fb);letter-spacing:1px;opacity:.9;margin-bottom:4px';i.appendChild(t)}
-  ORD.layanan.forEach(x=>{const s=document.createElement('span');s.className='tag';s.textContent=x;i.appendChild(s)});
-  if(!ORD.layanan.length&&!ORD.nota)i.textContent='Ceritakan pengalamanmu mencuci sepatu di U.ShoeS.';
+  const box=document.createElement('div');box.className='ordbox';
+  const row=(k,v)=>{const r=document.createElement('div');r.className='ordrow';const a=document.createElement('span');a.textContent=k;r.appendChild(a);
+    if(Array.isArray(v)){const w=document.createElement('div');w.className='tags';v.forEach(x=>{const t=document.createElement('span');t.className='tag';t.textContent=x;w.appendChild(t)});r.appendChild(w)}
+    else{const b=document.createElement('b');b.textContent=v;r.appendChild(b)}box.appendChild(r)};
+  if(ORD.nama)row('Nama',ORD.nama);
+  if(ORD.nota)row('No. Pesanan','#'+ORD.nota);
+  if(ORD.jumlah)row('Jumlah',ORD.jumlah+' pasang');
+  if(ORD.layanan.length)row('Layanan',ORD.layanan);
+  if(box.children.length)i.appendChild(box);else i.textContent='Ceritakan pengalamanmu mencuci sepatu di U.ShoeS.';
   /* sudah pernah mengisi untuk pesanan ini di HP yang sama */
   try{if(ORD.id&&localStorage.getItem('fbdone_'+ORD.id)){$('sumStars').innerHTML='';$('doneTxt').textContent='Kamu sudah mengisi kritik & saran untuk pesanan ini. Terima kasih banyak! 🙏';document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));$('pDone').classList.add('active')}}catch(e){}
 })();
@@ -268,8 +275,8 @@ function notif(list){const n=$('notif');n.innerHTML='<b>LENGKAPI DULU</b><ul>'+l
 /* ---------- kirim ---------- */
 function collect(){
   const o=ORD||{};
-  return{action:'feedback',waktu:new Date().toISOString(),orderId:o.id||'',nota:o.nota||'',nama:o.nama||'Anonim',wa:o.wa||'',layanan:o.layanan||[],
-    overall:V.overall,aspects:Object.assign({},V.aspects),suka:picked('suka'),perbaiki:picked('perbaiki'),saran:ta.value.trim()}
+  return{action:'feedback',waktu:new Date().toISOString(),orderId:o.id||'',nota:o.nota||'',nama:o.nama||'Anonim',wa:o.wa||'',layanan:o.layanan||[],jumlah:o.jumlah||0,
+    overall:V.overall,aspects:Object.assign({},V.aspects),suka:[],perbaiki:picked('perbaiki'),saran:ta.value.trim()}
 }
 function validate(){
   const errs=[];let first=null;const mark=(el,msg)=>{errs.push(msg);el.classList.add('err');if(!first)first=el};
@@ -280,10 +287,9 @@ function validate(){
 }
 function waText(d){
   const st=n=>'★'.repeat(n)+'☆'.repeat(5-n);
-  let t='*KRITIK & SARAN U.ShoeS*\n*Nama:* '+d.nama+(d.wa?'\n*No WA:* '+d.wa:'')+(d.nota?'\n*Nota:* #'+d.nota:'')+'\n\n*Penilaian:* '+st(d.overall)+' ('+d.overall+'/5)';
+  let t='*KRITIK & SARAN U.ShoeS*\n*Nama:* '+d.nama+(d.wa?'\n*No WA:* '+d.wa:'')+(d.nota?'\n*No. Pesanan:* #'+d.nota:'')+(d.jumlah?'\n*Jumlah:* '+d.jumlah+' pasang':'')+'\n\n*Penilaian:* '+st(d.overall)+' ('+d.overall+'/5)';
   ASP.forEach(a=>{if(d.aspects[a[0]])t+='\n- '+a[1]+': '+d.aspects[a[0]]+'/5'});
   if(d.layanan.length)t+='\n\n*Layanan:* '+d.layanan.join(', ');
-  if(d.suka.length)t+='\n*Yang disukai:* '+d.suka.join(', ');
   if(d.perbaiki.length)t+='\n*Perlu diperbaiki:* '+d.perbaiki.join(', ');
   if(d.saran)t+='\n\n*Saran:* '+d.saran;
   return t;
