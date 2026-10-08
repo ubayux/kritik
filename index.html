@@ -242,7 +242,12 @@ document.addEventListener('input',e=>{if(e.target.classList)e.target.classList.r
 /* ---------- data pesanan otomatis dari link: ?d=<kode> ---------- */
 const ORD=(function(){
   try{
-    let raw=new URLSearchParams(location.search).get('d');if(!raw)return null;
+    const qs=new URLSearchParams(location.search),short=qs.get('o');
+    if(short){ /* link pendek: nota~id~jumlah~wa~layanan~nama */
+      const a=short.split('~'),SV={Q:'Quick Cleaning',M:'Maximum Cleaning',D:'Deep Cleaning',E:'Express'},tt=(v,n)=>String(v==null?'':v).slice(0,n),nm=tt(a[5],60).trim();
+      return{id:tt(parseInt(a[1],36)||'',30),nota:tt(a[0],20),nama:nm,depan:tt(nm.split(' ')[0],30),wa:a[3]?tt('0'+a[3],20):'',jumlah:Math.max(0,parseInt(a[2],10)||0),
+        layanan:(a[4]||'').split(',').filter(Boolean).slice(0,8).map(x=>{if(x[0]==='='){const i=x.lastIndexOf('*');return tt(x.slice(1,i)+' × '+x.slice(i+1),50)}const n=SV[x[0]];return n?n+' × '+x.slice(1):tt(x,50)})}}
+    let raw=qs.get('d');if(!raw)return null;
     raw=raw.replace(/-/g,'+').replace(/_/g,'/').replace(/\s/g,'');while(raw.length%4)raw+='=';
     const j=JSON.parse(decodeURIComponent(escape(atob(raw))));
     const t=(v,n)=>String(v==null?'':v).slice(0,n);
