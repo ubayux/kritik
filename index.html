@@ -4,10 +4,33 @@
 <meta charset="UTF-8">
 <meta name="theme-color" content="#000000">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<script>
+/* Mode ringan otomatis untuk HP kurang bertenaga. Paksa: ?lite=1  |  matikan: ?lite=0 */
+(function(){
+    var d=document.documentElement,n=navigator,q=location.search;
+    var low=/[?&]lite=1/.test(q)||!!(n.connection&&n.connection.saveData)||!!(n.deviceMemory&&n.deviceMemory<=4)||!!(n.hardwareConcurrency&&n.hardwareConcurrency<=4);
+    if(/[?&]lite=0/.test(q)) low=false;
+    window.__lite=low; if(low) d.classList.add('lite');
+    if(low||/[?&]lite=0/.test(q)) return;
+    window.addEventListener('load',function(){
+        setTimeout(function(){
+            var t=[],last=0;
+            (function f(ts){
+                if(document.hidden) return;
+                if(last) t.push(ts-last); last=ts;
+                if(t.length<40) return requestAnimationFrame(f);
+                t.sort(function(a,b){return a-b});
+                if(t[t.length>>1]>26){ window.__lite=true; d.classList.add('lite'); }
+            })(0);
+        },700);
+    });
+})();
+</script>
 <title>Kritik &amp; Saran - U.ShoeS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Poppins:wght@300;400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Poppins:wght@300;400;500;600&display=swap"></noscript>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--ink:#fff;--gold:#ffc83d;--gold2:#ff9f0a;--ok:#7ee2a0;--bad:#ff8a82;
@@ -122,6 +145,30 @@ textarea{resize:none;min-height:96px;line-height:1.5;overflow:hidden;margin-bott
 .senderr small{display:block;margin-top:5px;font-size:.66rem;opacity:.6;overflow-wrap:anywhere}
 .foot{text-align:center;font-size:.66rem;opacity:.35;margin-top:18px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+
+/* ===== perbaikan: teks pilihan tidak boleh melewati garis kotak ===== */
+.opts{grid-template-columns:repeat(2,minmax(0,1fr))}
+.opt{min-width:0;max-width:100%;overflow:hidden;font-size:clamp(.64rem,3.1vw,.74rem)}
+.opt .tx{overflow-wrap:anywhere;word-break:normal;hyphens:auto;-webkit-hyphens:auto}
+.opt.good .tx{flex:0 1 auto;text-align:center}
+.opt:focus-visible{outline-offset:-3px}
+.opt.good{padding-left:12px;padding-right:34px}
+@media (max-width:380px){.opt{padding:8px 30px 8px 8px;gap:7px}.opt .em{width:24px;height:24px;font-size:.9rem;border-radius:8px}.opt::after{right:8px}}
+@media (max-width:340px){.opts{grid-template-columns:minmax(0,1fr)}}
+
+/* ===== MODE RINGAN (HP kurang bertenaga): tanpa blur kaca, filter, dan bayangan berlapis ===== */
+html.lite *{-webkit-backdrop-filter:none !important;backdrop-filter:none !important}
+html.lite body::before{display:none}
+html.lite .card{background:#1b1b1f !important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14),0 0 0 1px rgba(0,0,0,.7) !important;transition:none}
+html.lite .card.err{box-shadow:inset 0 0 0 1.5px rgba(255,107,97,.95),0 0 0 1px rgba(0,0,0,.7) !important}
+html.lite .opt{background:#2a2a2f !important;box-shadow:none !important}
+html.lite .star svg{filter:none !important}
+html.lite .star.on{filter:none !important}
+html.lite .btn,html.lite .btn.wa{box-shadow:none !important}
+html.lite #notif{background:#2a1513 !important}
+html.lite .page.active{animation:none}
+html.lite .star.pop{animation:none}
 </style>
 </head>
 <body>
@@ -188,7 +235,7 @@ textarea{resize:none;min-height:96px;line-height:1.5;overflow:hidden;margin-bott
 </div>
 
 <script>
-const API_URL='https://script.google.com/macros/s/AKfycbxYH26DJvj4ecQwGJOI2LiF2FRQYROFOL50-bzmBbMRa1Y3SUhdE5JsUVUSoe3Qn9Bf/exec';
+const API_URL='https://script.google.com/macros/s/AKfycbzcP_mMLf193SAgyfX9DZlCigW-fVKX_ik2q_z-3eXuTRUeB2C8v6o0BCbDGslsszSk/exec';
 const FB_URL='';   /* opsional: isi dengan URL Web App lain khusus kritik & saran. Kosong = pakai API_URL di atas */
 const STAR='<svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.1 6.6.9-4.8 4.6 1.2 6.6L12 17.5 6.1 20.7l1.2-6.6L2.5 9.5l6.6-.9z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>';
 const $=id=>document.getElementById(id);
