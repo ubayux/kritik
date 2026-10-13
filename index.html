@@ -246,8 +246,8 @@ html.lite .star.pop{animation:none}
 </div>
 
 <script>
-const API_URL='https://script.google.com/macros/s/AKfycbyY55TclYqIOgUDOCOjgdrxz-tkpV8W9XlfY36Lx3ymbnI-V93svloendnbu1Z5kQCu/exec';
-const FB_URL='https://script.google.com/macros/s/AKfycbxxF6GH5vdZ-dA_WyWKY76XoOAZ45fICjS9GEW6SjHetAurd5KFcQxtqOL7oiichj7xAw/exec';   /* URL Web App khusus kritik & saran (Kritik.gs, berakhiran /exec). Kosong = pakai API_URL di atas */
+const API_URL='https://script.google.com/macros/s/AKfycbzRMGpcfiJomgog5847d0pGVImH8cO_2gMdA8mjSoeUzulp6cE90FG1h-DMLXHJtASk/exec';
+const FB_URL='';   /* dikosongkan: kritik & saran kini ditangani Code.gs yang sama (API_URL di atas) */
 const STAR='<svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.1 6.6.9-4.8 4.6 1.2 6.6L12 17.5 6.1 20.7l1.2-6.6L2.5 9.5l6.6-.9z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>';
 const $=id=>document.getElementById(id);
 const LBL=['','Sangat kurang 😞','Kurang 😕','Cukup 🙂','Bagus 😄','Luar biasa! 🤩'];
@@ -301,7 +301,7 @@ const ORD=(function(){
     return{id:t(j.i,30),nota:t(j.n,20),nama:t(j.p||j.u,60),depan:t(j.u||String(j.p||'').split(' ')[0],30),wa:t(j.w,20),jumlah:Math.max(0,parseInt(j.q,10)||0),layanan:Array.isArray(j.s)?j.s.slice(0,8).map(x=>t(x,50)):[]};
   }catch(e){return null}
 })();
-(function(){
+function renderHello(){
   const h=$('hHai'),i=$('hInfo');
   if(!ORD){h.textContent='Halo, Sahabat U.ShoeS! 👋';i.textContent='Ceritakan pengalamanmu mencuci sepatu di U.ShoeS.';return}
   h.textContent='Halo, '+(ORD.depan||'Sahabat')+'! 👋';
@@ -315,7 +315,16 @@ const ORD=(function(){
   if(ORD.jumlah)row('Jumlah',ORD.jumlah+' pasang');
   if(ORD.layanan.length)row('Layanan',ORD.layanan);
   if(box.children.length)i.appendChild(box);else i.textContent='Ceritakan pengalamanmu mencuci sepatu di U.ShoeS.';
-})();
+}
+renderHello();
+/* data pesanan (nama, jumlah, layanan) diambil dari server berdasarkan nomor nota */
+function applyInfo(st){
+  const x=st&&st.info;if(!x||!ORD)return;const t=(v,n)=>String(v==null?'':v).slice(0,n);
+  if(x.nama){ORD.nama=t(x.nama,60).trim();ORD.depan=ORD.nama.split(' ')[0]}
+  if(x.jumlah)ORD.jumlah=Math.max(0,parseInt(x.jumlah,10)||0);
+  if(Array.isArray(x.layanan))ORD.layanan=x.layanan.slice(0,8).map(v=>t(v,50));
+  renderHello();
+}
 
 /* ---------- tampilan ---------- */
 function show(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));$(id).classList.add('active');window.scrollTo({top:0,behavior:'smooth'})}
@@ -348,7 +357,7 @@ async function serverState(ms){
     const r=await fetch(api('action=fbstatus&nota='+encodeURIComponent(ORD&&ORD.nota||'')+'&sid='+encodeURIComponent(SID)+'&_='+Date.now()),{signal:ac.signal});
     const tx=await r.text();LASTRAW=tx.slice(0,200);let j;try{j=JSON.parse(tx)}catch(e){LASTWHY='respons server bukan JSON (cek akses Web App = Anyone / belum deploy versi baru): '+tx.replace(/<[^>]*>/g,' ').trim().slice(0,90);return null}
     if(!(j&&j.ok)){LASTWHY='server menolak: '+String((j&&j.error)||'action fbstatus belum ada di Code.gs').slice(0,90);return null}
-    return{done:!!j.done,mine:!!j.mine,overall:parseInt(j.overall,10)||0};
+    return{done:!!j.done,mine:!!j.mine,overall:parseInt(j.overall,10)||0,info:j.info||null};
   }catch(e){LASTWHY=e&&e.name==='AbortError'?'waktu habis (server tidak menjawab)':'gagal terhubung: '+((e&&e.message)||e);return null}finally{clearTimeout(t)}
 }
 async function postFb(d,ms){
@@ -419,7 +428,7 @@ async function initGuard(){
   const KV=KEY();let flag=false;try{flag=!!(KV&&localStorage.getItem(KV))}catch(e){}
   let st=await serverState(8000);
   if(!st)st=await serverState(8000);                                   // percobaan kedua (server baru bangun)
-  dbg(st);
+  dbg(st);applyInfo(st);
   if(st&&st.done)return void thanks({overall:st.overall||0},true);   // sudah ada di Sheet -> "Terima kasih"
   if(st&&!st.done){try{localStorage.removeItem(KV)}catch(e){}}        // server bilang belum (mis. direset admin) -> form dibuka
   else{
@@ -427,7 +436,7 @@ async function initGuard(){
     if(flag)return void thanks({overall:0},true);                      // server tak terjangkau, tapi perangkat ini sudah pernah mengisi
   }
   show('pForm');
-  if(!st)serverState(10000).then(s=>{if(s&&s.done&&!sending)thanks({overall:s.overall||0},true)});   // coba lagi di belakang layar
+  if(!st)serverState(10000).then(s=>{applyInfo(s);if(s&&s.done&&!sending)thanks({overall:s.overall||0},true)});   // coba lagi di belakang layar
 }
 initGuard();
 </script>
