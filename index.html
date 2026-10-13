@@ -363,6 +363,7 @@ async function postFb(d,ms){
 function showErr(msg,why){const e=$('sendErr');e.innerHTML='<b>BELUM TERKIRIM</b>'+msg+(why?'<small>Penyebab: '+String(why).replace(/[<>&]/g,'')+'</small>':'');e.style.display='block';try{e.scrollIntoView({behavior:'smooth',block:'center'})}catch(x){}}
 function hideErr(){$('sendErr').style.display='none'}
 function thanks(d,already){
+  try{const k=KEY();if(k)localStorage.setItem(k,'1')}catch(e){}
   if(already){   /* sudah pernah mengisi (data dari Sheet): hanya centang + ucapan terima kasih */
     $('sumStars').innerHTML='';
     $('doneTxt').textContent='Masukanmu sudah kami terima dan sangat berarti untuk U.ShoeS.';
@@ -405,12 +406,19 @@ async function initGuard(){
     $('hHai').textContent='Halo, Sahabat U.ShoeS! 👋';
     $('hInfo').textContent='Kritik & saran diisi lewat link yang kami kirim lewat WhatsApp ya, Kak. Terima kasih sudah mencuci sepatu di U.ShoeS 🙏';
     return show('pForm')}
-  /* Form SELALU dibuka. Server hanya ditanya sebentar: kalau sudah ada isian untuk pesanan ini -> langsung "Terima kasih".
-     Kalau server lambat/tidak menjawab, form tetap tampil; satu-kali-isi tetap dijaga SERVER saat tombol kirim ditekan. */
-  const st=await serverState(6000);
-  if(st&&st.done)return void thanks({overall:st.overall||0},true);
+  /* Penentu utama = SERVER (Sheet): berlaku di perangkat/browser mana pun, juga setelah cache dihapus.
+     Penanda di perangkat ini (localStorage) hanya pelengkap saat server sedang tidak menjawab. */
+  const KV=KEY();let flag=false;try{flag=!!(KV&&localStorage.getItem(KV))}catch(e){}
+  let st=await serverState(8000);
+  if(!st)st=await serverState(8000);                                   // percobaan kedua (server baru bangun)
+  if(st&&st.done)return void thanks({overall:st.overall||0},true);   // sudah ada di Sheet -> "Terima kasih"
+  if(st&&!st.done){try{localStorage.removeItem(KV)}catch(e){}}        // server bilang belum (mis. direset admin) -> form dibuka
+  else{
+    console.warn('Status kritik tidak terverifikasi:',LASTWHY);
+    if(flag)return void thanks({overall:0},true);                      // server tak terjangkau, tapi perangkat ini sudah pernah mengisi
+  }
   show('pForm');
-  if(!st)serverState(10000).then(s=>{if(s&&s.done&&!sending)thanks({overall:s.overall||0},true)});   // coba sekali lagi di belakang layar
+  if(!st)serverState(10000).then(s=>{if(s&&s.done&&!sending)thanks({overall:s.overall||0},true)});   // coba lagi di belakang layar
 }
 initGuard();
 </script>
