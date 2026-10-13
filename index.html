@@ -176,7 +176,17 @@ html.lite .star.pop{animation:none}
 <div class="wrap">
  <div class="logo" role="img" aria-label="U.ShoeS"></div>
 
- <div class="page active" id="pForm">
+ <div class="page active" id="pLoad">
+  <div class="card done">
+   <p id="loadTxt" style="display:flex;align-items:center;justify-content:center;gap:10px;margin:8px 0"><span class="spin"></span>Memeriksa status pesananmu...</p>
+   <div id="loadErr" style="display:none;text-align:center">
+    <p style="margin:6px 0 14px">Halamannya belum selesai dimuat, Kak. Sinyal mungkin kurang bagus.</p>
+    <button type="button" class="btn" onclick="location.reload()">COBA LAGI</button>
+   </div>
+  </div>
+ </div>
+
+ <div class="page" id="pForm">
   <h1>Kritik &amp; Saran</h1>
   <div class="card hello" id="hello">
    <div class="hi" id="hHai">Halo! 👋</div>
@@ -334,7 +344,7 @@ async function serverState(ms){
   const ac=new AbortController(),t=setTimeout(()=>ac.abort(),ms||8000);
   try{
     const r=await fetch(api('action=fbstatus&oid='+encodeURIComponent(ORD&&ORD.id||'')+'&nota='+encodeURIComponent(ORD&&ORD.nota||'')+'&sid='+encodeURIComponent(SID)+'&_='+Date.now()),{cache:'no-store',signal:ac.signal});
-    const j=JSON.parse(await r.text());return j&&j.ok?{done:!!j.done,mine:!!j.mine}:null;
+    const j=JSON.parse(await r.text());return j&&j.ok?{done:!!j.done,mine:!!j.mine,overall:parseInt(j.overall,10)||0}:null;
   }catch(e){return null}finally{clearTimeout(t)}
 }
 async function postFb(d,ms){
@@ -345,13 +355,17 @@ async function postFb(d,ms){
     return j;
   }finally{clearTimeout(t)}
 }
-const flagDone=()=>{try{const k=KEY();if(k)localStorage.setItem(k,'1')}catch(e){}};
+
 function showErr(msg,why){const e=$('sendErr');e.innerHTML='<b>BELUM TERKIRIM</b>'+msg+(why?'<small>Penyebab: '+String(why).replace(/[<>&]/g,'')+'</small>':'');e.style.display='block';try{e.scrollIntoView({behavior:'smooth',block:'center'})}catch(x){}}
 function hideErr(){$('sendErr').style.display='none'}
 function thanks(d,already){
-  flagDone();
-  $('sumStars').innerHTML=already?'':[1,2,3,4,5].map(i=>`<svg viewBox="0 0 24 24" class="${i<=d.overall?'on':''}"><path d="M12 2.5l2.9 6.1 6.6.9-4.8 4.6 1.2 6.6L12 17.5 6.1 20.7l1.2-6.6L2.5 9.5l6.6-.9z"/></svg>`).join('');
-  $('doneTxt').textContent=already?'Kamu sudah mengisi kritik & saran untuk pesanan ini. Terima kasih banyak! 🙏':d.overall>=4?'Senang sekali kamu puas! Sampai jumpa di cucian berikutnya 👟':'Terima kasih sudah jujur. Masukanmu akan kami pakai untuk berbenah 🙏';
+  if(already){   /* sudah pernah mengisi (data dari Sheet): hanya centang + ucapan terima kasih */
+    $('sumStars').innerHTML='';
+    $('doneTxt').textContent='Masukanmu sudah kami terima dan sangat berarti untuk U.ShoeS.';
+    return show('pDone');
+  }
+  $('sumStars').innerHTML=[1,2,3,4,5].map(i=>`<svg viewBox="0 0 24 24" class="${i<=d.overall?'on':''}"><path d="M12 2.5l2.9 6.1 6.6.9-4.8 4.6 1.2 6.6L12 17.5 6.1 20.7l1.2-6.6L2.5 9.5l6.6-.9z"/></svg>`).join('');
+  $('doneTxt').textContent=d.overall>=4?'Senang sekali kamu puas! Sampai jumpa di cucian berikutnya 👟':'Terima kasih sudah jujur. Masukanmu akan kami pakai untuk berbenah 🙏';
   show('pDone');
 }
 function failBtn(){const b=$('btnKirim');sending=false;b.disabled=false;b.textContent='COBA LAGI'}
@@ -383,4 +397,17 @@ async function initGuard(){
   try{fetch(api('action=ping&_='+Date.now()),{cache:'no-store'}).catch(()=>{})}catch(e){}   // bangunkan server lebih dulu
   const btn=$('btnKirim');
   if(!ORD||!(ORD.id||ORD.nota)){   /* tanpa data pesanan: tampilkan sapaan ramah saja, form tidak dibuka */
-    document.querySelecto
+    document.querySelectorAll('#pForm .card:not(.hello),#pForm .lead,#btnKirim').forEach(c=>c.style.display='none');
+    $('hHai').textContent='Halo, Sahabat U.ShoeS! 👋';
+    $('hInfo').textContent='Kritik & saran diisi lewat link yang kami kirim lewat WhatsApp ya, Kak. Terima kasih sudah mencuci sepatu di U.ShoeS 🙏';
+    return show('pForm')}
+  /* Form TIDAK ditampilkan sebelum server menjawab. Tidak memakai localStorage: hanya data di Sheet yang menentukan. */
+  let st=null;for(let i=0;i<4&&!st;i++){st=await serverState(12000);if(!st)await sleep(1200)}
+  if(st&&st.done)return void thanks({overall:st.overall||0},true);   // sudah ada di Sheet -> langsung "Terima kasih"
+  if(!st){$('loadTxt').style.display='none';$('loadErr').style.display='block';return}   // server tak terjangkau -> jangan buka form
+  show('pForm');
+}
+initGuard();
+</script>
+</body>
+</html>
