@@ -181,6 +181,7 @@ html.lite .star.pop{animation:none}
    <p id="loadTxt" style="display:flex;align-items:center;justify-content:center;gap:10px;margin:8px 0"><span class="spin"></span>Memeriksa status pesananmu...</p>
    <div id="loadErr" style="display:none;text-align:center">
     <p style="margin:6px 0 14px">Halamannya belum selesai dimuat, Kak. Sinyal mungkin kurang bagus.</p>
+    <p id="loadWhy" style="font-size:12px;opacity:.6;margin:0 0 12px;word-break:break-word"></p>
     <button type="button" class="btn" onclick="location.reload()">COBA LAGI</button>
    </div>
   </div>
@@ -245,7 +246,7 @@ html.lite .star.pop{animation:none}
 </div>
 
 <script>
-const API_URL='https://script.google.com/macros/s/AKfycbz5JfCUwimXSO1ZBAzELXbU7pQXMyQtvheWNDrjFFA3jf1k8HFSjTVYhaVDoDp4HxJN/exec';
+const API_URL='https://script.google.com/macros/s/AKfycbxRsL1SDJiUpSVJsRLfdLXhZH0DJK6jBaxYEsfzNulRolwF6-d08FnyIsFtF0vNCPre/exec';
 const FB_URL='';   /* opsional: isi dengan URL Web App lain khusus kritik & saran. Kosong = pakai API_URL di atas */
 const STAR='<svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.1 6.6.9-4.8 4.6 1.2 6.6L12 17.5 6.1 20.7l1.2-6.6L2.5 9.5l6.6-.9z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>';
 const $=id=>document.getElementById(id);
@@ -340,12 +341,15 @@ const HOST=FB_URL||API_URL,api=q=>HOST+(HOST.indexOf('?')>=0?'&':'?')+q,sleep=ms
 const KEY=()=>ORD&&(ORD.id||ORD.nota)?'fbdone_'+(ORD.id||'n'+ORD.nota):'';
 let sending=false;
 /* Tanya server: sudah ada kiriman untuk pesanan ini / kiriman ini? -> {done,mine} atau null jika tidak terjangkau */
+let LASTWHY='';
 async function serverState(ms){
   const ac=new AbortController(),t=setTimeout(()=>ac.abort(),ms||8000);
   try{
     const r=await fetch(api('action=fbstatus&oid='+encodeURIComponent(ORD&&ORD.id||'')+'&nota='+encodeURIComponent(ORD&&ORD.nota||'')+'&sid='+encodeURIComponent(SID)+'&_='+Date.now()),{cache:'no-store',signal:ac.signal});
-    const j=JSON.parse(await r.text());return j&&j.ok?{done:!!j.done,mine:!!j.mine,overall:parseInt(j.overall,10)||0}:null;
-  }catch(e){return null}finally{clearTimeout(t)}
+    const tx=await r.text();let j;try{j=JSON.parse(tx)}catch(e){LASTWHY='respons server bukan JSON (cek akses Web App = Anyone / belum deploy versi baru): '+tx.replace(/<[^>]*>/g,' ').trim().slice(0,90);return null}
+    if(!(j&&j.ok)){LASTWHY='server menolak: '+String((j&&j.error)||'action fbstatus belum ada di Code.gs').slice(0,90);return null}
+    return{done:!!j.done,mine:!!j.mine,overall:parseInt(j.overall,10)||0};
+  }catch(e){LASTWHY=e&&e.name==='AbortError'?'waktu habis (server tidak menjawab)':'gagal terhubung: '+((e&&e.message)||e);return null}finally{clearTimeout(t)}
 }
 async function postFb(d,ms){
   const ac=new AbortController(),t=setTimeout(()=>ac.abort(),ms);
@@ -404,7 +408,7 @@ async function initGuard(){
   /* Form TIDAK ditampilkan sebelum server menjawab. Tidak memakai localStorage: hanya data di Sheet yang menentukan. */
   let st=null;for(let i=0;i<4&&!st;i++){st=await serverState(12000);if(!st)await sleep(1200)}
   if(st&&st.done)return void thanks({overall:st.overall||0},true);   // sudah ada di Sheet -> langsung "Terima kasih"
-  if(!st){$('loadTxt').style.display='none';$('loadErr').style.display='block';return}   // server tak terjangkau -> jangan buka form
+  if(!st){$('loadTxt').style.display='none';$('loadErr').style.display='block';$('loadWhy').textContent=LASTWHY?'Penyebab: '+LASTWHY:'';return}   // server tak terjangkau -> jangan buka form
   show('pForm');
 }
 initGuard();
