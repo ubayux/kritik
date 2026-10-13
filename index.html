@@ -235,7 +235,7 @@ html.lite .star.pop{animation:none}
 </div>
 
 <script>
-const API_URL='https://script.google.com/macros/s/AKfycbzcP_mMLf193SAgyfX9DZlCigW-fVKX_ik2q_z-3eXuTRUeB2C8v6o0BCbDGslsszSk/exec';
+const API_URL='https://script.google.com/macros/s/AKfycbz5JfCUwimXSO1ZBAzELXbU7pQXMyQtvheWNDrjFFA3jf1k8HFSjTVYhaVDoDp4HxJN/exec';
 const FB_URL='';   /* opsional: isi dengan URL Web App lain khusus kritik & saran. Kosong = pakai API_URL di atas */
 const STAR='<svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.1 6.6.9-4.8 4.6 1.2 6.6L12 17.5 6.1 20.7l1.2-6.6L2.5 9.5l6.6-.9z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>';
 const $=id=>document.getElementById(id);
@@ -378,14 +378,9 @@ async function kirim(){
   failBtn();showErr('Masukanmu belum masuk ke kami. Periksa koneksi internet, lalu tekan COBA LAGI. Isianmu tidak hilang.',why);
 }
 /* Link satu pesanan = satu kali isi. Penentunya server, jadi berlaku di HP / browser mana pun. */
-function initGuard(){
+function infoBox(judul,msg){const e=$('sendErr');e.innerHTML='<b>'+judul+'</b>'+msg;e.style.display='block'}
+async function initGuard(){
   try{fetch(api('action=ping&_='+Date.now()),{cache:'no-store'}).catch(()=>{})}catch(e){}   // bangunkan server lebih dulu
-  if(!ORD||!(ORD.id||ORD.nota))return;
-  let local=false;try{const k=KEY();local=!!(k&&localStorage.getItem(k))}catch(e){}
-  if(local)thanks({overall:0},true);
-  serverState(10000).then(st=>{if(st&&st.done)thanks({overall:0},true)});
-}
-initGuard();
-</script>
-</body>
-</html>
+  const btn=$('btnKirim');
+  if(!ORD||!(ORD.id||ORD.nota)){   /* tanpa data pesanan: tampilkan sapaan ramah saja, form tidak dibuka */
+    document.querySelecto
