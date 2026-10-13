@@ -247,7 +247,7 @@ html.lite .star.pop{animation:none}
 
 <script>
 const API_URL='https://script.google.com/macros/s/AKfycbyY55TclYqIOgUDOCOjgdrxz-tkpV8W9XlfY36Lx3ymbnI-V93svloendnbu1Z5kQCu/exec';
-const FB_URL='https://script.google.com/macros/s/AKfycbyJRZeoin4OcKEAMSPpXT0UIOM1HKcsDESR5LnC8LpmXepVMRyJCStJjOh4k56oY01HKg/exec';   /* URL Web App khusus kritik & saran (Kritik.gs, berakhiran /exec). Kosong = pakai API_URL di atas */
+const FB_URL='https://script.google.com/macros/s/AKfycbwqpYq1SBeWGy3k2x7zvfbFjfWUrDPDIC_K6dOFJGS8ewpxwvwtL2ACf2xxjEL-B7O3ew/exec';   /* URL Web App khusus kritik & saran (Kritik.gs, berakhiran /exec). Kosong = pakai API_URL di atas */
 const STAR='<svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.1 6.6.9-4.8 4.6 1.2 6.6L12 17.5 6.1 20.7l1.2-6.6L2.5 9.5l6.6-.9z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>';
 const $=id=>document.getElementById(id);
 const LBL=['','Sangat kurang 😞','Kurang 😕','Cukup 🙂','Bagus 😄','Luar biasa! 🤩'];
@@ -381,7 +381,7 @@ async function kirim(){
   if(navigator.onLine===false){failBtn();showErr('Tidak ada koneksi internet. Sambungkan dulu, lalu tekan COBA LAGI. Isianmu tidak hilang.','offline');return}
   const T=[10000,13000,16000];let why='';
   for(let i=0;i<T.length;i++){
-    btn.innerHTML='<span class="spin"></span>MENGIRIM'+(i?' ('+(i+1)+'/'+T.length+')':'')+'...';
+    btn.innerHTML='<span class="spin"></span>MENGIRIM...';
     try{
       const j=await postFb(d,T[i]);
       if(j&&j.ok)return void thanks(d,!!(j.already&&!j.mine));
