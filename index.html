@@ -178,7 +178,7 @@ html.lite .star.pop{animation:none}
 
  <div class="page active" id="pLoad">
   <div class="card done">
-   <p id="loadTxt" style="display:flex;align-items:center;justify-content:center;gap:10px;margin:8px 0"><span class="spin"></span>Mengecek pesananmu (memeriksa no. nota)...</p>
+   <p id="loadTxt" style="display:flex;align-items:center;justify-content:center;gap:10px;margin:8px 0"><span class="spin"></span>Memeriksa status pesananmu...</p>
    <div id="loadErr" style="display:none;text-align:center">
     <p style="margin:6px 0 14px">Halamannya belum selesai dimuat, Kak. Sinyal mungkin kurang bagus.</p>
     <p id="loadWhy" style="font-size:12px;opacity:.6;margin:0 0 12px;word-break:break-word"></p>
@@ -240,14 +240,13 @@ html.lite .star.pop{animation:none}
    <div class="tick"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
    <h2>TERIMA KASIH!</h2>
    <div class="sumstars" id="sumStars"></div>
-   <div id="doneOrd"></div>
    <p id="doneTxt">Masukanmu sudah kami terima dan sangat berarti untuk U.ShoeS.</p>
   </div>
  </div>
 </div>
 
 <script>
-const API_URL='https://script.google.com/macros/s/AKfycbyX-c63ahUbjY4VS5WLgts0_gSi-lytjgpsZ90U2yt0EY6XLYXGxGOjuT7Sbmox3IAW/exec';
+const API_URL='https://script.google.com/macros/s/AKfycbyaMSMB-OG0H-75Z7mpCnX0vuW2qOd6K43fWpqaPPeV_UQgs6h4_oYFG1_L1GV4Anto/exec';
 const FB_URL='';   /* dikosongkan: kritik & saran kini ditangani Code.gs yang sama (API_URL di atas) */
 const STAR='<svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.1 6.6.9-4.8 4.6 1.2 6.6L12 17.5 6.1 20.7l1.2-6.6L2.5 9.5l6.6-.9z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>';
 const $=id=>document.getElementById(id);
@@ -302,7 +301,11 @@ const ORD=(function(){
     return{id:t(j.i,30),nota:t(j.n,20),nama:t(j.p||j.u,60),depan:t(j.u||String(j.p||'').split(' ')[0],30),wa:t(j.w,20),jumlah:Math.max(0,parseInt(j.q,10)||0),layanan:Array.isArray(j.s)?j.s.slice(0,8).map(x=>t(x,50)):[]};
   }catch(e){return null}
 })();
-function ordBox(){
+function renderHello(){
+  const h=$('hHai'),i=$('hInfo');
+  if(!ORD){h.textContent='Halo, Sahabat U.ShoeS! 👋';i.textContent='Ceritakan pengalamanmu mencuci sepatu di U.ShoeS.';return}
+  h.textContent='Halo, '+(ORD.depan||'Sahabat')+'! 👋';
+  i.textContent='';
   const box=document.createElement('div');box.className='ordbox';
   const row=(k,v)=>{const r=document.createElement('div');r.className='ordrow';const a=document.createElement('span');a.textContent=k;r.appendChild(a);
     if(Array.isArray(v)){const w=document.createElement('div');w.className='tags';v.forEach(x=>{const t=document.createElement('span');t.className='tag';t.textContent=x;w.appendChild(t)});r.appendChild(w)}
@@ -311,13 +314,6 @@ function ordBox(){
   if(ORD.nota)row('No. Pesanan','#'+ORD.nota);
   if(ORD.jumlah)row('Jumlah',ORD.jumlah+' pasang');
   if(ORD.layanan.length)row('Layanan',ORD.layanan);
-  return box}
-function renderHello(){
-  const h=$('hHai'),i=$('hInfo');
-  if(!ORD){h.textContent='Halo, Sahabat U.ShoeS! 👋';i.textContent='Ceritakan pengalamanmu mencuci sepatu di U.ShoeS.';return}
-  h.textContent='Halo, '+(ORD.depan||'Sahabat')+'! 👋';
-  i.textContent='';
-  const box=ordBox();
   if(box.children.length)i.appendChild(box);else i.textContent='Ceritakan pengalamanmu mencuci sepatu di U.ShoeS.';
 }
 renderHello();
@@ -351,6 +347,7 @@ function validate(){
 /* ---------- kirim ---------- */
 const SID=(function(){try{return crypto.randomUUID()}catch(e){return 's'+Date.now().toString(36)+Math.random().toString(36).slice(2,12)}})();
 const HOST=FB_URL||API_URL,api=q=>HOST+(HOST.indexOf('?')>=0?'&':'?')+q,sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const KE=(new URLSearchParams(location.search).get('e')||''),KK=(new URLSearchParams(location.search).get('k')||'');
 const KEY=()=>ORD&&ORD.nota?'fbdone_n'+ORD.nota:'';
 let sending=false;
 /* Tanya server: sudah ada kiriman untuk pesanan ini / kiriman ini? -> {done,mine} atau null jika tidak terjangkau */
@@ -358,8 +355,9 @@ let LASTWHY='',LASTRAW='';
 async function serverState(ms){
   const ac=new AbortController(),t=setTimeout(()=>ac.abort(),ms||8000);
   try{
-    const r=await fetch(api('action=fbstatus&nota='+encodeURIComponent(ORD&&ORD.nota||'')+'&sid='+encodeURIComponent(SID)+'&_='+Date.now()),{signal:ac.signal});
+    const r=await fetch(api('action=fbstatus&nota='+encodeURIComponent(ORD&&ORD.nota||'')+'&sid='+encodeURIComponent(SID)+'&e='+encodeURIComponent(KE)+'&k='+encodeURIComponent(KK)+'&_='+Date.now()),{signal:ac.signal});
     const tx=await r.text();LASTRAW=tx.slice(0,200);let j;try{j=JSON.parse(tx)}catch(e){LASTWHY='respons server bukan JSON (cek akses Web App = Anyone / belum deploy versi baru): '+tx.replace(/<[^>]*>/g,' ').trim().slice(0,90);return null}
+    if(j&&(j.status==='expired'||j.status==='invalid'))return{blocked:j.status};
     if(!(j&&j.ok)){LASTWHY='server menolak: '+String((j&&j.error)||'action fbstatus belum ada di Code.gs').slice(0,90);return null}
     return{done:!!j.done,mine:!!j.mine,overall:parseInt(j.overall,10)||0,info:j.info||null};
   }catch(e){LASTWHY=e&&e.name==='AbortError'?'waktu habis (server tidak menjawab)':'gagal terhubung: '+((e&&e.message)||e);return null}finally{clearTimeout(t)}
@@ -375,9 +373,7 @@ async function postFb(d,ms){
 
 function showErr(msg,why){const e=$('sendErr');e.innerHTML='<b>BELUM TERKIRIM</b>'+msg+(why?'<small>Penyebab: '+String(why).replace(/[<>&]/g,'')+'</small>':'');e.style.display='block';try{e.scrollIntoView({behavior:'smooth',block:'center'})}catch(x){}}
 function hideErr(){$('sendErr').style.display='none'}
-function fillDoneOrd(){const w=$('doneOrd');w.innerHTML='';if(!ORD)return;const b=ordBox();if(b.children.length)w.appendChild(b)}
 function thanks(d,already){
-  fillDoneOrd();
   try{const k=KEY();if(k)localStorage.setItem(k,'1')}catch(e){}
   if(already){   /* nota ini sudah ada di Sheet "Kritik & Saran": beri tahu bahwa order ini sudah diisi */
     $('sumStars').innerHTML='';
@@ -392,7 +388,7 @@ function thanks(d,already){
 function failBtn(){const b=$('btnKirim');sending=false;b.disabled=false;b.textContent='COBA LAGI'}
 async function kirim(){
   if(sending)return;hideErr();$('notif').classList.remove('show');if(!validate())return;
-  const d=collect(),btn=$('btnKirim');d.sid=SID;sending=true;btn.disabled=true;
+  const d=collect(),btn=$('btnKirim');d.sid=SID;d.e=KE;d.k=KK;sending=true;btn.disabled=true;
   if(navigator.onLine===false){failBtn();showErr('Tidak ada koneksi internet. Sambungkan dulu, lalu tekan COBA LAGI. Isianmu tidak hilang.','offline');return}
   const T=[10000,13000,16000];let why='';
   for(let i=0;i<T.length;i++){
@@ -400,6 +396,7 @@ async function kirim(){
     try{
       const j=await postFb(d,T[i]);
       if(j&&j.ok)return void thanks(d,!!(j.already&&!j.mine));
+      if(j&&(j.status==='expired'||j.status==='invalid'))return void tutup(j.status);
       throw new Error((j&&j.error)||'ditolak server');
     }catch(e){
       why=e&&e.name==='AbortError'?'waktu habis, sinyal lemah':(e&&e.message)||String(e);
@@ -421,6 +418,14 @@ function dbg(st){
   d.textContent='DIAGNOSA\noid='+(ORD&&ORD.id)+'\nnota='+(ORD&&ORD.nota)+'\nserver='+HOST+'\nhasil='+JSON.stringify(st)+'\nrespons='+LASTRAW+'\nsebab='+LASTWHY;
   document.body.appendChild(d);
 }
+/* link kedaluwarsa / kode salah: form ditutup dengan pesan ramah */
+function tutup(why){
+  document.querySelectorAll('#pForm .card:not(.hello),#pForm .lead,#btnKirim').forEach(c=>c.style.display='none');
+  hideErr();sending=false;
+  $('hHai').textContent=why==='expired'?'Link ini sudah kedaluwarsa 🙏':'Link tidak valid 🙏';
+  $('hInfo').textContent=why==='expired'?'Masa pengisian kritik & saran untuk pesanan ini sudah berakhir. Terima kasih sudah mencuci sepatu di U.ShoeS!':'Link kritik & saran ini tidak dikenali. Silakan gunakan link yang kami kirim lewat WhatsApp ya, Kak.';
+  show('pForm');
+}
 async function initGuard(){
   try{fetch(api('action=ping&_='+Date.now())).catch(()=>{})}catch(e){}   // bangunkan server lebih dulu
   const btn=$('btnKirim');
@@ -434,23 +439,18 @@ async function initGuard(){
   const KV=KEY();let flag=false;try{flag=!!(KV&&localStorage.getItem(KV))}catch(e){}
   let st=await serverState(8000);
   if(!st)st=await serverState(8000);                                   // percobaan kedua (server baru bangun)
-  dbg(st);applyInfo(st);
-  if(st&&st.done)return void thanks({overall:st.overall||0},true);   // no. nota sudah ada di Sheet -> halaman "Sudah diisi"
-  if(st){
-    try{localStorage.removeItem(KV)}catch(e){}                        // server bilang belum (mis. direset admin)
-    if(!(ORD.nama&&ORD.jumlah>0&&ORD.layanan.length))return loadFail('Nomor pesanan #'+String(ORD.nota).replace(/^#/,'')+' tidak ditemukan. Pastikan kamu membuka link terbaru dari kami lewat WhatsApp.',false);
-    return void show('pForm');                                         // no. nota belum ada -> lanjut mengisi
+  dbg(st);
+  if(st&&st.blocked)return void tutup(st.blocked);
+  applyInfo(st);
+  if(st&&st.done)return void thanks({overall:st.overall||0},true);   // sudah ada di Sheet -> "Terima kasih"
+  if(st&&!st.done){try{localStorage.removeItem(KV)}catch(e){}}        // server bilang belum (mis. direset admin) -> form dibuka
+  else{
+    console.warn('Status kritik tidak terverifikasi:',LASTWHY);
+    if(flag)return void thanks({overall:0},true);                      // server tak terjangkau, tapi perangkat ini sudah pernah mengisi
   }
-  console.warn('Status kritik tidak terverifikasi:',LASTWHY);
-  if(flag)return void thanks({overall:0},true);                        // server tak terjangkau, tapi perangkat ini sudah pernah mengisi
-  loadFail('Halamannya belum selesai dimuat, Kak. Sinyal mungkin kurang bagus.',true);
+  show('pForm');
+  if(!st)serverState(10000).then(s=>{if(s&&s.blocked)return void tutup(s.blocked);applyInfo(s);if(s&&s.done&&!sending)thanks({overall:s.overall||0},true)});   // coba lagi di belakang layar
 }
-function loadFail(msg,retry){
-  $('loadTxt').style.display='none';
-  const e=$('loadErr');e.style.display='block';e.querySelector('p').textContent=msg;
-  $('loadWhy').textContent=retry?LASTWHY:'';
-  e.querySelector('button').style.display=retry?'':'none';
-  show('pLoad')}
 initGuard();
 </script>
 </body>
