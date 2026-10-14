@@ -157,6 +157,39 @@ textarea{resize:none;min-height:96px;line-height:1.5;overflow:hidden;margin-bott
 @media (max-width:380px){.opt{padding:8px 30px 8px 8px;gap:7px}.opt .em{width:24px;height:24px;font-size:.9rem;border-radius:8px}.opt::after{right:8px}}
 @media (max-width:340px){.opts{grid-template-columns:minmax(0,1fr)}}
 
+
+/* ===== loading awal: layar penuh dengan logo U.ShoeS ===== */
+#pLoad{position:fixed;inset:0;z-index:60;background:#000;display:none;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:24px;overflow:hidden}
+#pLoad.active{display:flex;animation:none}
+#pLoad::before{content:'';position:absolute;inset:0;background:radial-gradient(60% 40% at 50% 42%,rgba(255,200,61,.20),transparent 70%),radial-gradient(50% 35% at 85% 100%,rgba(124,196,255,.10),transparent 70%);animation:breathe 2.6s ease-in-out infinite}
+@keyframes breathe{50%{opacity:.55;transform:scale(1.08)}}
+.ld-stage{position:relative;width:min(78vw,330px);display:grid;place-items:center;margin-bottom:34px}
+.ld-ring{position:absolute;width:150%;aspect-ratio:1;border-radius:50%;border:1px solid rgba(255,200,61,.22);animation:ldring 3s ease-out infinite}
+.ld-ring.r2{animation-delay:1.5s}
+@keyframes ldring{0%{transform:scale(.45);opacity:.9}100%{transform:scale(1.15);opacity:0}}
+.ld-logo{position:relative;width:100%;aspect-ratio:338/97;background:var(--logo) center/contain no-repeat;animation:ldin .8s cubic-bezier(.2,.8,.2,1) both,ldfloat 3s ease-in-out .8s infinite;filter:drop-shadow(0 0 22px rgba(255,200,61,.35))}
+.ld-logo::after{content:'';position:absolute;inset:0;-webkit-mask:var(--logo) center/contain no-repeat;mask:var(--logo) center/contain no-repeat;
+  background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.95) 50%,transparent 65%) no-repeat;background-size:250% 100%;background-position:150% 0;animation:ldshine 2.2s ease-in-out .6s infinite}
+@keyframes ldin{from{opacity:0;transform:scale(.8) translateY(10px);filter:blur(8px)}to{opacity:1;transform:none}}
+@keyframes ldfloat{50%{transform:translateY(-6px)}}
+@keyframes ldshine{0%{background-position:150% 0}60%,100%{background-position:-50% 0}}
+.ld-bar{position:relative;width:min(56vw,220px);height:4px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden}
+.ld-bar::after{content:'';position:absolute;top:0;bottom:0;width:42%;border-radius:99px;background:linear-gradient(90deg,transparent,var(--gold),var(--gold2));animation:ldbar 1.3s ease-in-out infinite}
+@keyframes ldbar{0%{left:-45%}100%{left:103%}}
+.ld-txt{margin:18px 0 0;font:600 .72rem var(--fb);letter-spacing:3px;text-transform:uppercase;opacity:.7}
+.ld-txt i{font-style:normal;display:inline-block;animation:lddot 1.2s infinite}
+.ld-txt i:nth-child(2){animation-delay:.2s}.ld-txt i:nth-child(3){animation-delay:.4s}
+@keyframes lddot{0%,80%,100%{opacity:.15}40%{opacity:1}}
+#loadErr{position:relative;margin-top:26px;max-width:320px}
+#loadErr p{font-size:.82rem;line-height:1.5;opacity:.8}
+html.lite #pLoad::before,html.lite .ld-ring{display:none}
+html.lite .ld-logo{filter:none}
+
+/* ===== nomor pesanan besar ===== */
+.notabig{margin-top:14px;padding:16px 10px 14px;border-radius:22px;text-align:center;background:linear-gradient(180deg,rgba(255,200,61,.20),rgba(255,200,61,.05));border:1px solid rgba(255,200,61,.5);box-shadow:inset 0 1px 0 rgba(255,255,255,.2)}
+.notabig .lbl{display:block;font:700 .66rem var(--fb);letter-spacing:3px;opacity:.75}
+.notabig b{display:block;margin-top:4px;font:800 clamp(2.3rem,13vw,3.3rem)/1.05 var(--fb);letter-spacing:1px;color:var(--gold);text-shadow:0 0 24px rgba(255,200,61,.4);overflow-wrap:anywhere}
+
 /* ===== MODE RINGAN (HP kurang bertenaga): tanpa blur kaca, filter, dan bayangan berlapis ===== */
 html.lite *{-webkit-backdrop-filter:none !important;backdrop-filter:none !important}
 html.lite body::before{display:none}
@@ -176,14 +209,14 @@ html.lite .star.pop{animation:none}
 <div class="wrap">
  <div class="logo" role="img" aria-label="U.ShoeS"></div>
 
- <div class="page active" id="pLoad">
-  <div class="card done">
-   <p id="loadTxt" style="display:flex;align-items:center;justify-content:center;gap:10px;margin:8px 0"><span class="spin"></span>Memeriksa status pesananmu...</p>
-   <div id="loadErr" style="display:none;text-align:center">
-    <p style="margin:6px 0 14px">Halamannya belum selesai dimuat, Kak. Sinyal mungkin kurang bagus.</p>
-    <p id="loadWhy" style="font-size:12px;opacity:.6;margin:0 0 12px;word-break:break-word"></p>
-    <button type="button" class="btn" onclick="location.reload()">COBA LAGI</button>
-   </div>
+ <div class="page active" id="pLoad" role="status" aria-live="polite" aria-label="Memuat halaman">
+  <div class="ld-stage"><span class="ld-ring"></span><span class="ld-ring r2"></span><div class="ld-logo" role="img" aria-label="U.ShoeS"></div></div>
+  <div class="ld-bar"></div>
+  <p class="ld-txt">Memuat<i>.</i><i>.</i><i>.</i></p>
+  <div id="loadErr" style="display:none">
+   <p>Halamannya belum selesai dimuat, Kak. Sinyal mungkin kurang bagus.</p>
+   <p id="loadWhy" style="font-size:.68rem;opacity:.5;word-break:break-word"></p>
+   <button type="button" class="btn" onclick="location.reload()">COBA LAGI</button>
   </div>
  </div>
 
@@ -212,6 +245,7 @@ html.lite .star.pop{animation:none}
    <div class="q">Apa yang perlu diperbaiki? <small>PILIH BEBERAPA</small></div>
    <p class="hint">Ketuk untuk memilih, boleh lebih dari satu</p>
    <div class="opts" data-g="perbaiki">
+    <button type="button" class="opt good" aria-pressed="false" data-x="1"><span class="em">👍</span><span class="tx">Tidak ada, sudah bagus</span></button>
     <button type="button" class="opt" aria-pressed="false"><span class="em">🧼</span><span class="tx">Hasil kurang bersih</span></button>
     <button type="button" class="opt" aria-pressed="false"><span class="em">⏱️</span><span class="tx">Pengerjaan lama</span></button>
     <button type="button" class="opt" aria-pressed="false"><span class="em">💸</span><span class="tx">Harga</span></button>
@@ -219,7 +253,6 @@ html.lite .star.pop{animation:none}
     <button type="button" class="opt" aria-pressed="false"><span class="em">📝</span><span class="tx">Proses pemesanan</span></button>
     <button type="button" class="opt" aria-pressed="false"><span class="em">📦</span><span class="tx">Kemasan</span></button>
     <button type="button" class="opt wide" aria-pressed="false"><span class="em">➕</span><span class="tx">Lainnya</span></button>
-    <button type="button" class="opt good" aria-pressed="false" data-x="1"><span class="em">👍</span><span class="tx">Tidak ada, sudah bagus</span></button>
    </div>
   </div>
 
@@ -311,10 +344,11 @@ function renderHello(){
     if(Array.isArray(v)){const w=document.createElement('div');w.className='tags';v.forEach(x=>{const t=document.createElement('span');t.className='tag';t.textContent=x;w.appendChild(t)});r.appendChild(w)}
     else{const b=document.createElement('b');b.textContent=v;r.appendChild(b)}box.appendChild(r)};
   if(ORD.nama)row('Nama',ORD.nama);
-  if(ORD.nota)row('No. Pesanan','#'+ORD.nota);
   if(ORD.jumlah)row('Jumlah',ORD.jumlah+' pasang');
   if(ORD.layanan.length)row('Layanan',ORD.layanan);
-  if(box.children.length)i.appendChild(box);else i.textContent='Ceritakan pengalamanmu mencuci sepatu di U.ShoeS.';
+  if(ORD.nota){const nb=document.createElement('div');nb.className='notabig';const l=document.createElement('span');l.className='lbl';l.textContent='NO. PESANAN';const b=document.createElement('b');b.textContent='#'+String(ORD.nota).replace(/^#/,'');nb.appendChild(l);nb.appendChild(b);i.appendChild(nb)}
+  if(box.children.length)i.appendChild(box);
+  if(!i.children.length)i.textContent='Ceritakan pengalamanmu mencuci sepatu di U.ShoeS.';
 }
 renderHello();
 /* data pesanan (nama, jumlah, layanan) diambil dari server berdasarkan nomor nota */
@@ -377,8 +411,8 @@ function thanks(d,already){
   try{const k=KEY();if(k)localStorage.setItem(k,'1')}catch(e){}
   if(already){   /* nota ini sudah ada di Sheet "Kritik & Saran": beri tahu bahwa order ini sudah diisi */
     $('sumStars').innerHTML='';
-    document.querySelector('#pDone h2').textContent='KRITIK DAN SARAN SUDAH DIISI';
-    $('doneTxt').textContent='Kritik & saran untuk '+(ORD&&ORD.nota?'Nota Order #'+String(ORD.nota).replace(/^#/,''):'order ini')+' sudah diisi sebelumnya. Terima kasih 🙏';
+    document.querySelector('#pDone h2').textContent='SUDAH DIISI';
+    $('doneTxt').textContent='Kamu sudah mengisi kritik & saran untuk '+(ORD&&ORD.nota?'Nota Order #'+String(ORD.nota).replace(/^#/,''):'order ini')+'. Terima kasih ya! 🙏';
     return show('pDone');
   }
   $('sumStars').innerHTML=[1,2,3,4,5].map(i=>`<svg viewBox="0 0 24 24" class="${i<=d.overall?'on':''}"><path d="M12 2.5l2.9 6.1 6.6.9-4.8 4.6 1.2 6.6L12 17.5 6.1 20.7l1.2-6.6L2.5 9.5l6.6-.9z"/></svg>`).join('');
@@ -452,6 +486,8 @@ async function initGuard(){
   if(!st)serverState(10000).then(s=>{if(s&&s.blocked)return void tutup(s.blocked);applyInfo(s);if(s&&s.done&&!sending)thanks({overall:s.overall||0},true)});   // coba lagi di belakang layar
 }
 initGuard();
+/* bila server terlalu lama menjawab, loading diganti pesan + tombol coba lagi */
+setTimeout(function(){const l=$('pLoad');if(l&&l.classList.contains('active')){$('loadErr').style.display='block';$('loadWhy').textContent=LASTWHY||''}},25000);
 </script>
 </body>
 </html>
