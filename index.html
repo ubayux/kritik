@@ -423,7 +423,7 @@ function thanks(d,already){
   $('doneH').textContent=already?'SUDAH DIISI':'TERIMA KASIH!';
   $('doneHi').textContent=ORD&&ORD.depan?'Kak '+ORD.depan:'';
   $('sumStars').innerHTML=ov?[1,2,3,4,5].map(i=>`<svg viewBox="0 0 24 24" class="${i<=ov?'on':''}"><path d="M12 2.5l2.9 6.1 6.6.9-4.8 4.6 1.2 6.6L12 17.5 6.1 20.7l1.2-6.6L2.5 9.5l6.6-.9z"/></svg>`).join(''):'';
-  $('doneTxt').textContent=already?'Kritik & saran untuk pesanan ini sudah kami terima, jadi tidak perlu diisi lagi. Terima kasih ya! 🙏'
+  $('doneTxt').textContent=already?'Kritik & saran untuk pesanan ini sudah kami terima sebelumnya. Terima kasih 🙏'
     :ov>=4?'Senang sekali kamu puas! Sampai jumpa di cucian berikutnya 👟':'Terima kasih sudah jujur. Masukanmu akan kami pakai untuk berbenah 🙏';
   const nb=$('doneNota');nb.textContent='';
   if(nota){const l=document.createElement('span');l.textContent='NO. PESANAN';const b=document.createElement('b');b.textContent='#'+nota;nb.appendChild(l);nb.appendChild(b)}
