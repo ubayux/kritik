@@ -189,7 +189,7 @@ html.fin body{position:fixed;inset:0;width:100%}
 .donenota span{font:700 .58rem var(--fb);letter-spacing:2.5px;opacity:.55}
 .donenota b{font:800 1.6rem var(--fb);color:var(--gold);letter-spacing:1px}
 
-/* ===== nomor pesanan besar ===== */
+/* ===== nota pesanan besar ===== */
 .notabig{margin-top:14px;padding:16px 10px 14px;border-radius:22px;text-align:center;background:linear-gradient(180deg,rgba(255,200,61,.20),rgba(255,200,61,.05));border:1px solid rgba(255,200,61,.5);box-shadow:inset 0 1px 0 rgba(255,255,255,.2)}
 .notabig .lbl{display:block;font:700 .66rem var(--fb);letter-spacing:3px;opacity:.75}
 .notabig b{display:block;margin-top:4px;font:800 clamp(2.3rem,13vw,3.3rem)/1.05 var(--fb);letter-spacing:1px;color:var(--gold);text-shadow:0 0 24px rgba(255,200,61,.4);overflow-wrap:anywhere}
@@ -351,7 +351,7 @@ function renderHello(){
   if(ORD.nama)row('Nama',ORD.nama);
   if(ORD.jumlah)row('Jumlah',ORD.jumlah+' pasang');
   if(ORD.layanan.length)row('Layanan',ORD.layanan);
-  if(ORD.nota){const nb=document.createElement('div');nb.className='notabig';const l=document.createElement('span');l.className='lbl';l.textContent='NO. PESANAN';const b=document.createElement('b');b.textContent='#'+String(ORD.nota).replace(/^#/,'');nb.appendChild(l);nb.appendChild(b);i.appendChild(nb)}
+  if(ORD.nota){const nb=document.createElement('div');nb.className='notabig';const l=document.createElement('span');l.className='lbl';l.textContent='NOTA PESANAN';const b=document.createElement('b');b.textContent='#'+String(ORD.nota).replace(/^#/,'');nb.appendChild(l);nb.appendChild(b);i.appendChild(nb)}
   if(box.children.length)i.appendChild(box);
   if(!i.children.length)i.textContent='Ceritakan pengalamanmu mencuci sepatu di U.ShoeS.';
 }
@@ -435,7 +435,7 @@ function thanks(d,already){
   $('doneTxt').textContent=already?'Kritik & saran untuk pesanan ini sudah kami terima sebelumnya. Terima kasih 🙏'
     :ov>=4?'Senang sekali kamu puas! Sampai jumpa di cucian berikutnya 👟':'Terima kasih sudah jujur. Masukanmu akan kami pakai untuk berbenah 🙏';
   const nb=$('doneNota');nb.textContent='';
-  if(nota){const l=document.createElement('span');l.textContent='NO. PESANAN';const b=document.createElement('b');b.textContent='#'+nota;nb.appendChild(l);nb.appendChild(b)}
+  if(nota){const l=document.createElement('span');l.textContent='NOTA PESANAN';const b=document.createElement('b');b.textContent='#'+nota;nb.appendChild(l);nb.appendChild(b)}
   show('pDone');
 }
 function failBtn(){const b=$('btnKirim');sending=false;b.disabled=false;b.textContent='COBA LAGI'}
